@@ -19,7 +19,7 @@ const cors = require("cors");
 app.use(cors());
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
 
   socket.on("send_message", (data) => {
     const { message, username, room, sendTime } = data;
-    socket.to(room).emit("receive_message", data); //this sends the msg to all users in room including the sender
+    io.to(room).emit("receive_message", data); //this sends the msg to all users in room including the sender
 
     //save message in db
     saveMessages(message, username, room, sendTime)

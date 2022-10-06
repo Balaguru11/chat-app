@@ -77,8 +77,12 @@ const ChatRoomPage = ({ socket, token }) => {
     }
     // Remove event listener on component unmount
     return () => socket.off("receive_message");
+    //eslint-disable-next-line
   }, []);
 
+  const leaveHere = () => {
+    socket.emit("disconnect");
+  };
   return (
     <>
       <Container>
@@ -103,6 +107,7 @@ const ChatRoomPage = ({ socket, token }) => {
             </form>
           </Grid>
         </Grid>
+        <Button onClick={leaveHere}>Leave</Button>
       </Container>
     </>
   );

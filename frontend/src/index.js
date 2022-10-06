@@ -17,10 +17,15 @@ axios.interceptors.request.use((request) => {
 export const myAxios = axios.create({
   baseUrl: process.env.REACT_APP_BASEURL,
   headers: {
-    // "content-type": "application/json",
+    "content-type": "application/json",
     authorization: `Bearer ${localStorage.getItem("token")}`,
     "Access-Control-Allow-Credentials": true,
   },
+});
+
+myAxios.interceptors.response.use((response) => {
+  console.log("axios res", response);
+  return response;
 });
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

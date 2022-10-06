@@ -6,20 +6,19 @@ import { Grid, Box } from "@mui/material";
 const ChatRoomCardList = ({ ok, socket }) => {
   const [crs, setCrs] = useState([]);
 
-  const getAllRooms = async () => {
-    await myAxios
-      .get("/safe/chat")
-      .then((res) => {
-        console.log("getAllChatrooms", res);
-        res?.data && setCrs(res.data);
-      })
-      .catch((err) => console.error(err));
-  };
-
   useEffect(() => {
+    const getAllRooms = async () => {
+      await myAxios
+        .get("/safe/chat")
+        .then((res) => {
+          console.log("getAllChatrooms", res);
+          res?.data && setCrs(res.data);
+        })
+        .catch((err) => console.error(err));
+    };
     getAllRooms();
     //eslint-disable-next-line
-  }, []);
+  }, [ok]);
 
   const Chatrooms = ({ crs }) => {
     return (

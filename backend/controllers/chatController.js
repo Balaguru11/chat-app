@@ -30,7 +30,7 @@ exports.getAllChatRooms = async (req, res, next) => {
   try {
     const allLiveChats = await ChatRoom.find({});
     console.log(allLiveChats);
-    res.json(allLiveChats);
+    return res.json(allLiveChats);
   } catch (err) {
     next(err);
   }
