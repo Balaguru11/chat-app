@@ -11,11 +11,13 @@ import {
   colors,
 } from "@mui/material";
 
+import useAuth from "../hooks/useAuth";
+
 const LoginPage = (props) => {
   const navigate = useNavigate();
+  const { state, dispatch } = useAuth();
 
-  const token = localStorage.getItem("token");
-  if (token) {
+  if (state?.token) {
     navigate("/home");
   }
 
@@ -52,7 +54,7 @@ const LoginPage = (props) => {
             <hr />
           </Box>
           <Box height={25} />
-          <Login setupSocket={props.setupSocket} token={props.token} />
+          <Login setupSocket={props.setupSocket} />
           <Box height={15} />
           <Divider />
           <Box height={15} />

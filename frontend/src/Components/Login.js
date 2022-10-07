@@ -4,6 +4,7 @@ import { string, object } from "yup";
 import { Box, Container, TextField, Typography, Button } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const initialValues = {
   email: "",
@@ -14,24 +15,34 @@ const validationSchema = object({
   password: string().required("Password is required"),
 });
 const Login = ({ setupSocket }) => {
+  const { state, dispatch } = useAuth();
   const navigate = useNavigate();
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={(values, formikHelpers) => {
+        console.log(values);
         axios
           .post("/auth/signin", { ...values })
           .then((res) => {
             console.log(res);
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("userId", res.data.others._id);
-            localStorage.setItem("username", res.data.others.username);
+            // localStorage.setItem("token", res.data.token);
+            // localStorage.setItem("userId", res.data.others._id);
+            // localStorage.setItem("username", res.data.others.username);
+            dispatch({
+              type: "LOGIN",
+              payload: {
+                userId: res.data.others._id,
+                email: res.data.others.email,
+                token: res.data.token,
+                username: res.data.others.username,
+              },
+            });
             navigate("/home");
             setupSocket();
           })
-          .catch((err) => console.log(err))
-          .console.log(values);
+          .catch((err) => console.log(err));
 
         formikHelpers.resetForm();
       }}

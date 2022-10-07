@@ -28,6 +28,7 @@ exports.creatChatroom = async (req, res, next) => {
 
 exports.getAllChatRooms = async (req, res, next) => {
   try {
+    console.log("came here");
     const allLiveChats = await ChatRoom.find({});
     console.log(allLiveChats);
     return res.json(allLiveChats);
@@ -38,7 +39,6 @@ exports.getAllChatRooms = async (req, res, next) => {
 
 exports.getRoomById = async (req, res, next) => {
   try {
-    console.log(req.params.roomid);
     const roomDetails = await ChatRoom.findById(req.params.roomid);
     console.log(roomDetails);
     res.json(roomDetails);

@@ -8,8 +8,10 @@ import axios from "axios";
 
 axios.defaults.baseURL = process.env.REACT_APP_BASEURL;
 
+console.log(localStorage.getItem("token"));
+
 axios.interceptors.request.use((request) => {
-  const token = `Bearer ${localStorage.getItem("token")}`;
+  const token = `Bearer ${JSON.parse(localStorage.getItem("token"))}`;
   request.headers.authorization = token;
   return request;
 });
@@ -18,7 +20,7 @@ export const myAxios = axios.create({
   baseUrl: process.env.REACT_APP_BASEURL,
   headers: {
     "content-type": "application/json",
-    authorization: `Bearer ${localStorage.getItem("token")}`,
+    authorization: `Bearer ${JSON.parse(localStorage.getItem("token"))}`,
     "Access-Control-Allow-Credentials": true,
   },
 });

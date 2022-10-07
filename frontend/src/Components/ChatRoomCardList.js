@@ -2,23 +2,36 @@ import React, { useState, useEffect } from "react";
 import ChatRoomCard from "./ChatRoomCard";
 import { myAxios } from "../index";
 import { Grid, Box } from "@mui/material";
+import useAuth from "../hooks/useAuth";
 
 const ChatRoomCardList = ({ ok, socket }) => {
   const [crs, setCrs] = useState([]);
+  const { state } = useAuth();
+  console.log("state from card list", state);
+
+  const getAllRooms = async () => {
+    await myAxios
+      .get("/safe/chat")
+      .then((res) => {
+        console.log(res);
+        res?.status === 200 && setCrs(res.data);
+      })
+      .catch((err) => console.log(err));
+    // try {
+    //   let response = await myAxios.get("/safe/chat");
+    //   console.log("getAllChatrooms", response);
+    //   response?.data && setCrs(response.data);
+    // } catch (err) {
+    //   console.log(err);
+    // }
+  };
 
   useEffect(() => {
-    const getAllRooms = async () => {
-      await myAxios
-        .get("/safe/chat")
-        .then((res) => {
-          console.log("getAllChatrooms", res);
-          res?.data && setCrs(res.data);
-        })
-        .catch((err) => console.error(err));
-    };
-    getAllRooms();
+    if (state?.isLoggedIn) {
+      getAllRooms();
+    }
     //eslint-disable-next-line
-  }, [ok]);
+  }, []);
 
   const Chatrooms = ({ crs }) => {
     return (

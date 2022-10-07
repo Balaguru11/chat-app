@@ -10,13 +10,14 @@ import {
   Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 const ChatRoomCard = (props) => {
   const navigate = useNavigate();
+  const { state } = useAuth();
 
   const joinRoom = (e, room) => {
-    const username = localStorage.getItem("username");
-    if (room !== "" && username !== "") {
-      props.socket.emit("join_room", { username, room });
+    if (room !== "" && state?.username !== "") {
+      props.socket.emit("join_room", { username: state?.username, room });
       navigate(`/chat/${room}`);
     }
   };

@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { myAxios } from "../index";
 // import CreateChatRoom from "../Components/CreateChatRoom";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Container, Box, Grid, TextField, Button } from "@mui/material";
-
+import useAuth from "../hooks/useAuth";
 // chatroom : chat page
 
-const ChatRoomPage = ({ socket, token }) => {
+const ChatRoomPage = ({ socket }) => {
+  const { state, dispatch } = useAuth();
   const [messages, setMessages] = useState([]);
   const { roomid } = useParams();
-  const userId = localStorage.getItem("userId");
-  const username = localStorage.getItem("username");
+  const navigate = useNavigate();
+  const userId = state?.userid;
+  const username = state?.username;
   const [crName, setCrName] = useState("");
   const [msgText, setMsgText] = useState("");
+
+  useEffect(() => {
+    if (!state?.isLoggedIn) {
+      navigate("/signin");
+    }
+  }, [state]);
 
   // socket.emit("connect", socket);
 
@@ -47,6 +55,7 @@ const ChatRoomPage = ({ socket, token }) => {
 
   // as per the chat cosey
   const sendMessage = () => {
+    // e.preventDefault();
     if (socket) {
       //emit the message and clear the input field.
       socket.emit("send_message", {
@@ -81,7 +90,9 @@ const ChatRoomPage = ({ socket, token }) => {
   }, []);
 
   const leaveHere = () => {
-    socket.emit("disconnect");
+    socket.emit("leave_chatroom", { username, room: roomid });
+    socket.disconnect();
+    navigate("/home");
   };
   return (
     <>

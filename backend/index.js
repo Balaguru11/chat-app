@@ -17,6 +17,13 @@ connect();
 const { Server } = require("socket.io");
 const cors = require("cors");
 app.use(cors());
+
+//routes and controllers
+app.use("/auth", require("./routes/authRoute"));
+app.use("/safe/user", require("./routes/secure/userRoute"));
+app.use(verifyToken);
+app.use("/safe/chat", require("./routes/secure/chatRoute"));
+
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000",
@@ -28,12 +35,6 @@ const io = new Server(server, {
 const CHAT_BOT = "Chatbot";
 let chatRoom = "";
 let allUsers = [];
-
-//routes and controllers
-app.use("/auth", require("./routes/authRoute"));
-app.use(verifyToken);
-app.use("/safe/user", require("./routes/secure/userRoute"));
-app.use("/safe/chat", require("./routes/secure/chatRoute"));
 
 io.use((socket, next) => {
   try {
@@ -63,6 +64,7 @@ io.on("connection", (socket) => {
 
     // save New user to the Chatroom
     chatRoom = room;
+    console.log("allUsers", allUsers);
     allUsers.push({ id: socket.id, username, room });
     let chatRoomUsers = allUsers.filter((user) => user.room === room);
     socket.to(room).emit("chatroom_users", chatRoomUsers);
@@ -104,6 +106,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User disconnected from the chat");
+    console.log("allusers 108", allUsers);
     const user = allUsers.find((user) => user.id === socket.id);
     if (user?.username) {
       allUsers = leaveRoom(socket.id, allUsers);
@@ -120,8 +123,9 @@ app.use((err, req, res, next) => {
   const message = err.message || "Something went wrong";
   return res.status(status).json({
     success: false,
-    status,
-    message,
+    // status,
+    // message,
+    err,
   });
 });
 
