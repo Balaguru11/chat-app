@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Login from "../Components/Login";
 import { useNavigate } from "react-router-dom";
 import {
@@ -13,13 +13,16 @@ import {
 
 import useAuth from "../hooks/useAuth";
 
-const LoginPage = (props) => {
+const LoginPage = ({ setupSocket }) => {
   const navigate = useNavigate();
   const { state, dispatch } = useAuth();
 
-  if (state?.token) {
-    navigate("/home");
-  }
+  useEffect(() => {
+    if (state?.token) {
+      navigate("/home");
+      setupSocket();
+    }
+  }, [state]);
 
   return (
     <>
@@ -54,7 +57,7 @@ const LoginPage = (props) => {
             <hr />
           </Box>
           <Box height={25} />
-          <Login setupSocket={props.setupSocket} />
+          <Login setupSocket={setupSocket} />
           <Box height={15} />
           <Divider />
           <Box height={15} />

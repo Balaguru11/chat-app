@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { string, object } from "yup";
 import { Box, Container, TextField, Typography, Button } from "@mui/material";
@@ -17,6 +17,12 @@ const validationSchema = object({
 const Login = ({ setupSocket }) => {
   const { state, dispatch } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (state?.isLoggedIn) {
+    }
+    setupSocket();
+  }, []);
   return (
     <Formik
       initialValues={initialValues}
@@ -27,9 +33,6 @@ const Login = ({ setupSocket }) => {
           .post("/auth/signin", { ...values })
           .then((res) => {
             console.log(res);
-            // localStorage.setItem("token", res.data.token);
-            // localStorage.setItem("userId", res.data.others._id);
-            // localStorage.setItem("username", res.data.others.username);
             dispatch({
               type: "LOGIN",
               payload: {

@@ -9,19 +9,19 @@ const HomePage = ({ socket }) => {
   const navigate = useNavigate();
   const [ok, setOk] = useState(false);
   const { state, dispatch } = useAuth();
-  console.log("state frok home page", state);
 
   useEffect(() => {
     if (!state?.isLoggedIn) {
       navigate("/signin");
     }
     // eslint-disable-next-line
-  }, [state]);
+  }, [state.isLoggedIn]);
 
   const logOut = () => {
     dispatch({
       type: "LOGOUT",
     });
+    socket.emit("disconnect");
   };
   return (
     <>

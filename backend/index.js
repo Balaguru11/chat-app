@@ -3,14 +3,23 @@ const express = require("express");
 const app = express();
 const { connect } = require("./config/dbConfig");
 const { saveMessages, getMessages } = require("./services/saveMessages");
-const { leaveRoom } = require("./services/roomService");
+const { leaveRoom, joinRoom } = require("./services/roomService");
 const verifyToken = require("./middlewares/verifyToken");
 const http = require("http");
 const server = http.createServer(app);
 const jwt = require("jsonwebtoken");
+// const session = require("express-session");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// const sessionMiddleware = session({
+//   secret: process.env.SESSION_SECRET,
+//   resave: false,
+//   saveUninitialized: false,
+// });
+
+// app.use(sessionMiddleware);
 
 connect();
 
@@ -32,10 +41,6 @@ const io = new Server(server, {
   },
 });
 
-const CHAT_BOT = "Chatbot";
-let chatRoom = "";
-let allUsers = [];
-
 io.use((socket, next) => {
   try {
     const token = socket.handshake.query.token;
@@ -46,26 +51,32 @@ io.use((socket, next) => {
   } catch (err) {}
 });
 
+const CHAT_BOT = "Chatbot";
+let chatRoom = "";
+let allUsers = [];
+
 io.on("connection", (socket) => {
   console.log(`User connected. ${socket.id}`);
-
   socket.on("join_room", (data) => {
     //data will be sent from client which will be having user and room Details;
-    const { username, room } = data; // destructuring the data
+    const { userId, username, room } = data; // destructuring the data
     socket.join(room);
-
-    // Send message to all user in the room expect the one who joining now (Say: Bala joined the chat room)
-    let joinTime = Date.now();
-    socket.to(room).emit("receive_message", {
-      message: `${username} has joined the chat room`,
-      username: CHAT_BOT,
-      joinTime,
+    joinRoom(userId, room).then((res) => {
+      if (res) {
+        let joinTime = Date.now();
+        socket.to(room).emit("receive_message", {
+          message: `${username} has joined the chat room`,
+          username: CHAT_BOT,
+          joinTime,
+        });
+      }
+      // Send message to all user in the room expect the one who joining now (Say: Bala joined the chat room)
     });
 
     // save New user to the Chatroom
     chatRoom = room;
-    console.log("allUsers", allUsers);
-    allUsers.push({ id: socket.id, username, room });
+    // allUsers = [...allUsers, { id: socket.id, username, room }];
+    allUsers.push({ id: socket.id, userId: userId, username, room });
     let chatRoomUsers = allUsers.filter((user) => user.room === room);
     socket.to(room).emit("chatroom_users", chatRoomUsers);
 
@@ -78,23 +89,29 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_message", (data) => {
-    const { message, username, room, sendTime } = data;
-    io.to(room).emit("receive_message", data); //this sends the msg to all users in room including the sender
+    const { message, userId, room, sendTime } = data;
+
+    // io.to(room).emit("receive_message", data);
+    //this sends the msg to all users in room including the sender
 
     //save message in db
-    saveMessages(message, username, room, sendTime)
+    saveMessages(message, userId, room, sendTime)
       .then((res) => {
-        console.log(res);
+        console.log("message sent and saved", res);
+        io.to(room).emit("receive_message", data);
+        // socket.emit("send_status", { message, status: "sent" });
       })
       .catch((err) => console.log(err));
   });
 
   socket.on("leave_chatroom", (data) => {
-    const { username, room } = data;
+    const { userId, username, room } = data;
     socket.leave(room);
-    const leftTime = Date.now();
 
-    allUsers = leaveRoom(socket.id, allUsers);
+    //update the chatroom userschatting
+
+    const leftTime = Date.now();
+    allUsers = leaveRoom(userId, allUsers, room);
     socket.to(room).emit("chatroom_users", allUsers);
     socket.to(room).emit("receive_message", {
       username: CHAT_BOT,
@@ -106,7 +123,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("User disconnected from the chat");
-    console.log("allusers 108", allUsers);
     const user = allUsers.find((user) => user.id === socket.id);
     if (user?.username) {
       allUsers = leaveRoom(socket.id, allUsers);
@@ -123,8 +139,8 @@ app.use((err, req, res, next) => {
   const message = err.message || "Something went wrong";
   return res.status(status).json({
     success: false,
-    // status,
-    // message,
+    status,
+    message,
     err,
   });
 });

@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema(
   {
     message: { type: String, required: true },
-    from: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+    userId: { type: mongoose.Types.ObjectId, required: true, ref: "User" },
     //   to: { type: mongoose.Types.ObjectId, required: true, ref: "user" },
     room: { type: mongoose.Types.ObjectId, required: true, ref: "ChatRoom" },
     sentTime: { type: Date, required: true },

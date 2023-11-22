@@ -1,0 +1,8 @@
+1. Login / Signup needs a header
+2. Google Signup required.
+3. After Signup, show categories to choose from. (So we can display chats based on the selected categories)
+4. Create Chatroom will ask 2 Data. Chatroom name & Category.
+5. Join the chatroom and speak.
+6. The chatroom will be available for 48 hours if it has only 1 user left.
+7. Chat backup is required.
+8. Inputs, attachments, audio need to be added.

@@ -7,7 +7,6 @@ const { createError } = require("../error");
 
 exports.creatChatroom = async (req, res, next) => {
   const user = req.user;
-  console.log(user);
   try {
     //duplication on title allowed.
     const newChatroom = await ChatRoom.create({
@@ -22,15 +21,14 @@ exports.creatChatroom = async (req, res, next) => {
       newChatroom,
     });
   } catch (err) {
+    console.log(err.response.data);
     next(err);
   }
 };
 
 exports.getAllChatRooms = async (req, res, next) => {
   try {
-    console.log("came here");
     const allLiveChats = await ChatRoom.find({});
-    console.log(allLiveChats);
     return res.json(allLiveChats);
   } catch (err) {
     next(err);
@@ -40,7 +38,6 @@ exports.getAllChatRooms = async (req, res, next) => {
 exports.getRoomById = async (req, res, next) => {
   try {
     const roomDetails = await ChatRoom.findById(req.params.roomid);
-    console.log(roomDetails);
     res.json(roomDetails);
   } catch (err) {
     next(err);
@@ -49,7 +46,6 @@ exports.getRoomById = async (req, res, next) => {
 
 exports.getMsgsByRoomId = async (req, res, next) => {
   try {
-    console.log(req.params.roomid);
     const roomMsgs = await Message.find({ room: req.params.roomid });
     console.log(roomMsgs);
     res.json(roomMsgs);

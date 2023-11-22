@@ -2,13 +2,25 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../model/User.Model");
 const { createError } = require("../error");
+const { checkDuplicateUser } = require("../services/apiServices");
 
 exports.signUpUser = async (req, res, next) => {
   try {
-    const hashPwd = bcrypt.hashSync(req.body.password, 10);
-    const newUser = new User({ ...req.body, password: hashPwd });
-    await newUser.save();
-    res.status(200).json({ message: "User signup successful" });
+    // check for duplicate accounts
+
+    checkDuplicateUser(req.body.password)
+      .then(() => {
+        const hashPwd = bcrypt.hashSync(req.body.password, 10);
+        const userData = { ...req.body, password: hashPwd };
+        // newUser.save();
+        // res.status(200).json({ message: "User signup successful" });
+        return userData;
+      })
+      .then((userData) => createNewuser(userData))
+      .then((ress) =>
+        res.status(200).json({ message: "User signup successful" })
+      )
+      .catch((err) => console.log(err));
   } catch (err) {
     next(err);
   }

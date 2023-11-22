@@ -1,19 +1,21 @@
 // const axios = require("axios");
 const Message = require("../model/Message.Model");
 
-exports.saveMessages = async (message, username, room, sentTime) => {
-  const savedMsg = await Message.insertOne({
-    message,
-    from: username,
-    room,
-    sentTime,
-  });
-  console.log("Saved Message", savedMsg);
-  return savedMsg;
+exports.saveMessages = async (message, userId, room, sentTime) => {
+  try {
+    const savedMsg = await Message.create({
+      message,
+      userId,
+      room,
+      sentTime,
+    });
+    return true;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 exports.getMessages = async (room) => {
   const messages = await Message.find({ room: room });
-  console.log("Get Message", messages);
   return messages;
 };

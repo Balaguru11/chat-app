@@ -7,6 +7,7 @@ import SignUpPage from "./Pages/SignUpPage";
 import LoginPage from "./Pages/LoginPage";
 import HomePage from "./Pages/HomePage";
 import ChatRoomPage from "./Pages/ChatRoomPage";
+import Chatroom from "./Components/chatroom";
 
 //implementing context api
 
@@ -79,7 +80,7 @@ const App = () => {
 
   const setupSocket = () => {
     if (state?.token && !socket) {
-      const newSocket = io("http://localhost:8010", {
+      const newSocket = io.connect("http://localhost:8010", {
         query: {
           token: state?.token,
         },
@@ -112,6 +113,7 @@ const App = () => {
         <div className="App">
           <Routes>
             <Route path="/" exact element={<IndexPage />} />
+            <Route path="/test" element={<Chatroom />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route
               path="/signin"

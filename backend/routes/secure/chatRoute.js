@@ -10,7 +10,7 @@ const {
 
 // create chatroom
 router.route("/").get(getAllChatRooms).post(creatChatroom);
-router.get("/:roomid", getRoomById);
+router.route("/:roomid").get(getRoomById);
 router.get("/message/:roomid", getMsgsByRoomId);
 
 module.exports = router;

@@ -7,7 +7,6 @@ import useAuth from "../hooks/useAuth";
 const ChatRoomCardList = ({ ok, socket }) => {
   const [crs, setCrs] = useState([]);
   const { state } = useAuth();
-  console.log("state from card list", state);
 
   const getAllRooms = async () => {
     await myAxios

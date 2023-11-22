@@ -2,10 +2,7 @@ const { createError } = require("../error");
 const jwt = require("jsonwebtoken");
 
 module.exports = async (req, res, next) => {
-  console.log(req.headers);
   const authHeader = req.headers.authorization || req.headers.Authorization;
-
-  console.log("AuthHeader", authHeader);
 
   if (
     authHeader === undefined ||
@@ -21,7 +18,7 @@ module.exports = async (req, res, next) => {
       console.log(err);
       return next(createError(403, "Invalid Authorization code"));
     }
-    console.log("verifytoken", decoded);
+    console.log(decoded);
     req.user = decoded;
     next();
   });

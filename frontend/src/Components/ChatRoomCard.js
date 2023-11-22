@@ -11,44 +11,59 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-const ChatRoomCard = (props) => {
+
+const ChatRoomCard = ({ socket, room }) => {
   const navigate = useNavigate();
   const { state } = useAuth();
 
   const joinRoom = (e, room) => {
+    e.preventDefault();
     if (room !== "" && state?.username !== "") {
-      props.socket.emit("join_room", { username: state?.username, room });
+      socket.emit("join_room", {
+        userId: state?.userId,
+        username: state?.username,
+        room,
+      });
       navigate(`/chat/${room}`);
     }
   };
   return (
     <>
-      <Card key={props.room._id} sx={{ m: 1, boxShadow: 3, display: "flex" }}>
+      <Card key={room._id} sx={{ m: 1, boxShadow: 3, display: "flex" }}>
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <CardContent>
             <Typography variant="h6" component="h5">
-              {props.room.chatRoomTitle}
+              {room.chatRoomTitle}
             </Typography>
             <Typography variant="caption" component="p">
-              Category: {props.room.chatRoomCategory} |{" "}
-              {props.room.chatRoomType.toUpperCase()} Group
+              Category: {room.chatRoomCategory} |{" "}
+              {room.chatRoomType.toUpperCase()} Group
             </Typography>
             <Chip
-              label={`Live Users: ${props.room.usersChatting.length}`}
+              label={`Live Users: ${room.usersChatting.length}`}
               sx={{ backgroundColor: "papayawhip" }}
             />
           </CardContent>
         </Box>
-        <CardActions>
-          <Button
-            variant="contained"
-            color="warning"
-            size="small"
-            onClick={(e) => joinRoom(e, props.room._id)}
-          >
-            Join
-          </Button>
-        </CardActions>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <CardActions>
+            <Button
+              variant="contained"
+              color="warning"
+              size="small"
+              onClick={(e) => joinRoom(e, room._id)}
+            >
+              Join
+            </Button>
+          </CardActions>
+        </Box>
       </Card>
     </>
   );

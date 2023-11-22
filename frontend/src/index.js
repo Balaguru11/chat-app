@@ -8,8 +8,6 @@ import axios from "axios";
 
 axios.defaults.baseURL = process.env.REACT_APP_BASEURL;
 
-console.log(localStorage.getItem("token"));
-
 axios.interceptors.request.use((request) => {
   const token = `Bearer ${JSON.parse(localStorage.getItem("token"))}`;
   request.headers.authorization = token;
@@ -26,7 +24,6 @@ export const myAxios = axios.create({
 });
 
 myAxios.interceptors.response.use((response) => {
-  console.log("axios res", response);
   return response;
 });
 
